@@ -1,0 +1,75 @@
+/* =====================================================================
+   Motion: loader, page transitions, hero entrance, scroll reveals,
+   ticker, ripple, typing caret. All switched off for reduced motion.
+   ===================================================================== */
+
+/* Loading animation: shown once per visit, removes itself even without JS */
+.loader{display:none}
+html.show-loader .loader{position:fixed;inset:0;z-index:300;display:grid;place-content:center;justify-items:center;gap:1.25rem;background:#050B16;pointer-events:none;animation:loader-out .4s ease .75s forwards}
+.loader svg{width:120px;height:56px}
+.loader path{fill:none;stroke:#C9A227;stroke-width:3;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:200;stroke-dashoffset:200;animation:draw .7s var(--ease) forwards}
+.loader span{font:500 .8rem/1 var(--font-mono);color:#D5DEEB}
+@keyframes loader-out{to{opacity:0;visibility:hidden}}
+@keyframes draw{to{stroke-dashoffset:0}}
+
+/* Page transitions (progressive enhancement, no script needed) */
+@view-transition{navigation:auto}
+::view-transition-old(root){animation:page-out .22s ease both}
+::view-transition-new(root){animation:page-in .38s var(--ease) both}
+@keyframes page-out{to{opacity:0}}
+@keyframes page-in{from{opacity:0;transform:translateY(10px)}}
+
+/* Theme change */
+html.theme-fade body,html.theme-fade body *{transition:background-color .45s ease,color .45s ease,border-color .45s ease!important}
+html.theme-switching::view-transition-old(root){animation:page-out .45s ease both}
+html.theme-switching::view-transition-new(root){animation:fade-in .45s ease both}
+@keyframes fade-in{from{opacity:0}}
+
+/* One orchestrated entrance for page headers */
+.enter{animation:rise .8s var(--ease) both;animation-delay:var(--d,0s)}
+@keyframes rise{from{opacity:.01;transform:translateY(18px)}}
+.portrait img{animation:portrait-in 1s var(--ease) both}
+@keyframes portrait-in{from{transform:translateY(28px) scale(.985)}}
+.page-head__chart path{stroke-dasharray:1;stroke-dashoffset:1;animation:draw 2.2s var(--ease) .2s forwards}
+
+/* Scroll reveals (classes are added by scroll.js only below the fold) */
+.reveal{opacity:0;transform:translateY(24px);transition:opacity .7s var(--ease),transform .7s var(--ease);transition-delay:var(--delay,0ms)}
+.reveal[data-reveal="left"]{transform:translateX(-28px)}
+.reveal[data-reveal="right"]{transform:translateX(28px)}
+.reveal[data-reveal="zoom"]{transform:scale(.94)}
+.reveal.is-in{opacity:1;transform:none}
+main{overflow-x:clip}                        /* side reveals never widen the page */
+
+/* Ticker */
+.tape__track{animation:ticker 38s linear infinite}
+.tape__view:hover .tape__track,.motion-paused .tape__track{animation-play-state:paused}
+@keyframes ticker{to{transform:translateX(-50%)}}
+
+/* Typing effect */
+.typing__rest{opacity:0}
+.typing__caret{display:inline-block;width:2px;height:1.05em;margin-right:-2px;vertical-align:-.15em;background:var(--gold);animation:blink 1s steps(1) infinite}
+.typing.is-done .typing__caret{animation:blink 1s steps(1) 3,hide 0s 3s forwards}
+@keyframes blink{50%{opacity:0}}
+@keyframes hide{to{opacity:0}}
+
+/* Button ripple */
+.ripple{position:absolute;z-index:-1;border-radius:50%;background:currentColor;opacity:.22;transform:scale(0);animation:ripple .6s ease-out forwards;pointer-events:none}
+@keyframes ripple{to{transform:scale(1);opacity:0}}
+
+/* Modal entrance */
+.modal[open]{animation:modal-in .35s var(--ease)}
+@keyframes modal-in{from{opacity:0;transform:scale(.95)}}
+
+/* Reduced motion */
+@media (prefers-reduced-motion:reduce){
+  html{scroll-behavior:auto}
+  *,*::before,*::after{animation-duration:.001ms!important;animation-delay:0s!important;animation-iteration-count:1!important;transition-duration:.001ms!important;transition-delay:0s!important}
+  html.show-loader .loader{display:none}
+  .tape__track{animation:none!important}
+  .tape__view{overflow-x:auto}
+  .tape ul+ul,.motion-toggle{display:none}
+  .typing__rest{opacity:1}
+  .typing__caret{display:none}
+  .reveal{opacity:1;transform:none}
+  @view-transition{navigation:none}
+}
